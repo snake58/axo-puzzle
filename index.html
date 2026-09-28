@@ -319,11 +319,17 @@ window.AxoHooks = {
     try{ if(on){ stopMusic(); } else if(!S.muted){ startMusic(); } }catch(e){}
   },
   reloadSave:function(){
+    /* El adaptador de Playgama llama esto cuando bridge.storage ya devolvio
+       el save: reemplazar el estado y recargar el nivel para aplicar el
+       tablero en curso restaurado. */
     try{
       var d=JSON.parse(Store.get('v1'));
       if(d&&d.v===1){
         d.hints=d.hints||{date:todayStr(),count:3};
-        S=d; refillHints(); applyI18n(); updateCounters();
+        S=d; refillHints(); applyI18n();
+        var rb=d.board;
+        if(rb&&rb.daily&&rb.day===todayStr()) loadLevel(1,true);
+        else loadLevel(d.level||1,false);
       }
     }catch(e){}
   }
@@ -392,7 +398,19 @@ function t(k){var L=I18N[S.lang];return (L&&L[k]!==undefined)?L[k]:I18N.es[k];}
 function defState(){return {v:1,level:1,stars:{},score:0,fish:0,hints:{date:todayStr(),count:3},
 daily:{},streak:0,lastDaily:null,lang:portalLang()||'es',seenHowto:false,muted:false};}
 var S=(function(){try{var d=JSON.parse(Store.get('v1'));if(d&&d.v===1){d.hints=d.hints||{date:todayStr(),count:3};return d;}}catch(e){}return defState();})();
-function save(){try{Store.set('v1',JSON.stringify(S));}catch(e){}}
+function save(){
+  try{
+    /* Snapshot del tablero en curso para que un reload restaure el progreso
+       (lo exige la certificacion de Playgama: "Game Saves"). */
+    if(G&&!won){
+      S.board={n:levelNum,daily:isDaily,day:isDaily?todayStr():null,grid:G.board,
+        lives:G.lives,mistakes:mistakes,hintsUsed:hintsUsed,scored:Array.from(scoredCells)};
+    }else if(won){S.board=null;}
+    /* Si !G (p. ej. save() desde init antes del primer loadLevel), se conserva
+       el snapshot que venia en el store para que loadLevel pueda restaurarlo. */
+    Store.set('v1',JSON.stringify(S));
+  }catch(e){}
+}
 function refillHints(){if(S.hints.date!==todayStr()){S.hints={date:todayStr(),count:3};save();}}
 
 /* ================= puzzle bank (pre-generated, unique solutions, zero givens) =================
@@ -730,6 +748,17 @@ function loadLevel(n,daily){
   G={N:b.N,regions:b.regions,solution:b.solution,
      board:Array.from({length:b.N},function(){return new Array(b.N).fill(0);})};
   G.lives=3;G.noFish=false;G.scoreStart=S.score;
+  /* Restaurar tablero en curso si el save corresponde a este nivel (reload). */
+  try{
+    var sb=S.board;
+    if(sb&&sb.n===n&&!!sb.daily===!!daily&&(!sb.daily||sb.day===todayStr())&&
+       sb.grid&&sb.grid.length===b.N&&sb.grid[0]&&sb.grid[0].length===b.N){
+      G.board=sb.grid;
+      if(typeof sb.lives==='number')G.lives=sb.lives;
+      mistakes=sb.mistakes||0;hintsUsed=sb.hintsUsed||0;
+      scoredCells=new Set(sb.scored||[]);
+    }
+  }catch(e){}
   buildBoard();updateCounters();updateHintBtn();updateDailyBtn();updateFish();
   try{if(window.Portal&&window.Portal.levelChanged)window.Portal.levelChanged(isDaily?0:levelNum);}catch(e){}
   (function(){var s=$('#lvlSplash');if(!s)return;
@@ -934,6 +963,7 @@ function setCell(r,c,val,opts){
   refreshCell(r,c);
   validate();updateCounters();
   if(!opts.skipWin)checkWin();
+  save();
 }
 function validate(){
   if(!G)return 0;
@@ -1017,12 +1047,14 @@ function undo(){
   var m=undoStack.pop();
   if(!m)return;
   G.board[m.r][m.c]=m.prev;
-  refreshCell(m.r,m.c);validate();updateCounters();sfx('tick');
+  refreshCell(m.r,m.c);validate();updateCounters();sfx('tick');save();
 }
 function resetLevel(){
   if(won||!G)return;
   undoStack=[];
   for(var r=0;r<G.N;r++)for(var c=0;c<G.N;c++){G.board[r][c]=0;}
+  mistakes=0;hintsUsed=0;scoredCells=new Set();
+  S.board=null;save();
   refreshAllCells();validate();updateCounters();sfx('tick');
 }
 </script>
@@ -1147,7 +1179,7 @@ $('#axoBtn').addEventListener('click',function(){
 $('#btnRetry').addEventListener('click',function(){ensureAudio();sfx('click');
   $('#noFishModal').classList.remove('show');
   if(!G)return;
-  S.score=G.scoreStart;save();
+  S.score=G.scoreStart;S.board=null;save();
   G.noFish=false;G.lives=3;mistakes=0;undoStack=[];
   resetLevel();updateFish();updateCounters();
 });
@@ -1156,7 +1188,7 @@ $('#howtoBtn').addEventListener('click',function(){ensureAudio();sfx('click');$(
 $('#btnPlay').addEventListener('click',function(){ensureAudio();sfx('click');S.seenHowto=true;save();$('#howtoModal').classList.remove('show');});
 $('#btnNext').addEventListener('click',function(){ensureAudio();sfx('click');
   if(isDaily)loadLevel(S.level,false);else loadLevel(levelNum+1,false);});
-$('#btnReplay').addEventListener('click',function(){ensureAudio();sfx('click');loadLevel(levelNum,isDaily);});
+$('#btnReplay').addEventListener('click',function(){ensureAudio();sfx('click');S.board=null;save();loadLevel(levelNum,isDaily);});
 
 /* ================= self-test (?test=1) ================= */
 function findEmpty(){for(var r=0;r<G.N;r++)for(var c=0;c<G.N;c++)if(G.board[r][c]===0)return {r:r,c:c};return null;}
