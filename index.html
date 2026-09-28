@@ -198,6 +198,14 @@ font-size:17px;cursor:pointer;box-shadow:0 2px 5px rgba(180,130,60,.2);display:f
   <button id="btnRetry" class="primary" data-i18n="retry">Reintentar nivel</button>
 </div></div>
 
+<div class="modal" id="rewardModal"><div class="card">
+  <div style="font-size:56px;line-height:1">🎬</div>
+  <h2 data-i18n="rewardTitle">¡Sin pistas!</h2>
+  <p data-i18n="rewardText">Mira un anuncio corto y gana 1 pista gratis.</p>
+  <button id="btnWatchAd" class="primary" data-i18n="watchAd">Ver anuncio</button>
+  <button id="btnRewardCancel" class="ghost" data-i18n="cancel">Cancelar</button>
+</div></div>
+
 <div class="modal" id="howtoModal"><div class="card">
   <h2 data-i18n="howtoTitle">¿Cómo jugar?</h2>
   <div id="howSteps"></div>
@@ -368,6 +376,8 @@ noHints:"Sin pistas. Completa niveles para ganar más.",hintUsed:"💡 ¡Pista u
 axoModeOn:"Modo colocar activado: toca una casilla",axoModeOff:"Modo colocar desactivado",
 wrongTap:"¡Ese no! -1 🐟",
 noFishTitle:"¡Te quedaste sin peces! 🐟",noFishText:"Toca 2 veces con cuidado: cada error cuesta 1 pez.",retry:"Reintentar nivel",
+rewardTitle:"¡Sin pistas! 🔍",rewardText:"Mira un anuncio corto y gana 1 pista gratis.",watchAd:"Ver anuncio",cancel:"Cancelar",
+hintEarned:"¡Pista ganada! 🎉",adFailed:"El anuncio no pudo cargarse. Inténtalo de nuevo.",
 stars:"estrellas",bonus:"Bonus",fishEarned:"peces ganados",
 step1:"Toca una casilla vacía para marcar X. Tócala otra vez para quitarla.",
 step2:"Toca 2 veces rápido una casilla para colocar un ajolote. Si te equivocas, pierdes 1 pez 🐟. Solo tienes 3 peces por nivel. También puedes usar el botón +.",
@@ -384,6 +394,8 @@ noHints:"No hints left. Complete levels to earn more.",hintUsed:"💡 Hint used!
 axoModeOn:"Place mode on: tap a tile",axoModeOff:"Place mode off",
 wrongTap:"Wrong one! -1 🐟",
 noFishTitle:"Out of fish! 🐟",noFishText:"Double-tap carefully: each mistake costs 1 fish.",retry:"Retry level",
+rewardTitle:"Out of hints! 🔍",rewardText:"Watch a short ad and earn 1 free hint.",watchAd:"Watch ad",cancel:"Cancel",
+hintEarned:"Hint earned! 🎉",adFailed:"The ad couldn't load. Try again.",
 stars:"stars",bonus:"Bonus",fishEarned:"fish earned",
 step1:"Tap an empty tile to mark X. Tap it again to remove it.",
 step2:"Double-tap a tile to place an axolotl. If you guess wrong, you lose 1 fish 🐟. You only have 3 fish per level. You can also use the + button.",
@@ -1030,7 +1042,13 @@ function useHint(){
   // Hint places an axolotl directly on a random empty solution cell (never costs a fish).
   if(won||!G||G.noFish)return;
   refillHints();
-  if(S.hints.count<=0){toast(t('noHints'));sfx('error');return;}
+  if(S.hints.count<=0){
+    /* Sin pistas: en portales con rewarded ads se ofrece ver un anuncio a
+       cambio de 1 pista (lo exige la certificacion de Playgama). */
+    if(window.Portal&&window.Portal.rewarded){offerRewardAd();}
+    else{toast(t('noHints'));}
+    sfx('error');return;
+  }
   var cand=[];
   G.solution.forEach(function(k){
     var p=k.split(','),r=+p[0],c=+p[1];
@@ -1041,6 +1059,25 @@ function useHint(){
   S.hints.count--;hintsUsed++;save();updateHintBtn();
   setCell(pick.r,pick.c,1);
   toast(t('hintUsed'));sfx('click');
+}
+/* Anuncio recompensado: ver el anuncio otorga 1 pista. Solo se ofrece en
+   portales cuyo adaptador declara Portal.rewarded=true. */
+function offerRewardAd(){
+  $('#rewardModal').classList.add('show');
+}
+function watchRewardAd(){
+  $('#rewardModal').classList.remove('show');
+  if(!window.Portal||!window.Portal.rewarded||!window.Portal.showRewarded){toast(t('noHints'));return;}
+  try{window.AxoHooks.adPause(true);}catch(e){}
+  window.Portal.showRewarded(function(ok){
+    try{window.AxoHooks.adPause(false);}catch(e){}
+    if(ok){
+      S.hints.count=(S.hints.count||0)+1;save();updateHintBtn();
+      toast(t('hintEarned'));sfx('star');
+    }else{
+      toast(t('adFailed'));sfx('error');
+    }
+  });
 }
 function undo(){
   if(won||!G||G.noFish)return;
@@ -1183,6 +1220,8 @@ $('#btnRetry').addEventListener('click',function(){ensureAudio();sfx('click');
   G.noFish=false;G.lives=3;mistakes=0;undoStack=[];
   resetLevel();updateFish();updateCounters();
 });
+$('#btnWatchAd').addEventListener('click',function(){ensureAudio();sfx('click');watchRewardAd();});
+$('#btnRewardCancel').addEventListener('click',function(){sfx('click');$('#rewardModal').classList.remove('show');});
 $('#dailyBtn').addEventListener('click',function(){ensureAudio();sfx('click');loadLevel(1,true);});
 $('#howtoBtn').addEventListener('click',function(){ensureAudio();sfx('click');$('#howtoModal').classList.add('show');});
 $('#btnPlay').addEventListener('click',function(){ensureAudio();sfx('click');S.seenHowto=true;save();$('#howtoModal').classList.remove('show');});
@@ -1335,6 +1374,23 @@ async function runTests(){
     for(var hr=0;hr<G.N;hr++)for(var hc=0;hc<G.N;hc++)
       if(G.board[hr][hc]===1&&!G.solution.has(hr+','+hc))hintOnSol=false;
     ck(hintOnSol,'hint axolotl sits on a solution cell','');
+    // --- rewarded ad: 0 hints + portal con rewarded -> modal, ver anuncio da 1 pista ---
+    var P0r=window.Portal.rewarded, P0f=window.Portal.showRewarded;
+    window.Portal.rewarded=true;
+    window.Portal.showRewarded=function(cb){cb(true);};
+    S.hints.count=0;updateHintBtn();
+    useHint();await wait(30);
+    ck($('#rewardModal').classList.contains('show'),'reward modal shows when 0 hints + rewarded portal','');
+    $('#btnWatchAd').click();await wait(30);
+    ck(!$('#rewardModal').classList.contains('show'),'reward modal closes on watch','');
+    ck(S.hints.count===1,'rewarded ad grants 1 hint',String(S.hints.count));
+    // ad fallido no da pista
+    window.Portal.showRewarded=function(cb){cb(false);};
+    S.hints.count=0;useHint();await wait(30);
+    $('#btnWatchAd').click();await wait(30);
+    ck(S.hints.count===0,'failed ad grants no hint',String(S.hints.count));
+    window.Portal.rewarded=P0r;window.Portal.showRewarded=P0f;
+    $('#rewardModal').classList.remove('show');
     // --- reset leaves the board fully empty ---
     resetLevel();await wait(30);
     ck(countV(3)===0&&countV(1)===0&&countV(2)===0,'reset leaves board fully empty, no "?" cells','');
