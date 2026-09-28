@@ -49,21 +49,18 @@ text-align:center;font-weight:700;color:#8A6D4B;line-height:1.25;display:flex;fl
 .mini .ban{position:absolute;inset:-2px;display:flex;align-items:center;justify-content:center;color:#E23E57;font-weight:900;font-size:15px}
 #boardWrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;position:relative}
 #board{width:min(100%,50dvh);aspect-ratio:1/1;display:grid;gap:3px;grid-auto-rows:1fr;background:#fff;padding:11px;border-radius:26px;
-box-shadow:0 12px 30px rgba(180,130,60,.32),0 0 0 4px #F9D976,0 0 0 7px #fff;border:5px solid #fff}
+box-shadow:0 12px 30px rgba(180,130,60,.32),0 0 0 4px #F9D976,0 0 0 7px #fff;border:5px solid #fff;touch-action:none}
 .cell{border-radius:9px;position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;min-width:0;min-height:0;
 box-shadow:inset 0 2px 3px rgba(255,255,255,.55),inset 0 -3px 5px rgba(120,70,20,.10)}
 .cell .tok{width:94%;height:94%;object-fit:contain;background:transparent;
 filter:drop-shadow(0 3px 3px rgba(90,50,20,.35));animation:pop .28s cubic-bezier(.2,1.6,.4,1);pointer-events:none}
 
 .cell.x::after{content:"\2715";font-weight:900;color:#8A6D4B;font-size:clamp(14px,5vw,22px);animation:pop .2s}
-.cell.clue{box-shadow:inset 0 0 0 2.5px #E2548B}
-.cell.clue::after{content:"?";color:#E2548B;font-weight:900;font-size:clamp(16px,6vw,26px);animation:blink 1.3s infinite}
 .cell.conflict{animation:shake .32s}
 .cell.conflict .tok{filter:drop-shadow(0 3px 3px rgba(90,50,20,.35)) drop-shadow(0 0 6px #E23E57)}
 .cell.conflict{box-shadow:inset 0 0 0 2.5px #E23E57}
 @keyframes pop{0%{transform:scale(.3)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
 .controls{display:flex;gap:12px;justify-content:center;align-items:center}
 .cbtn{width:62px;height:62px;border-radius:50%;border:3px solid #fff;background:#fff;cursor:pointer;position:relative;
 box-shadow:0 4px 12px rgba(180,130,60,.3);font-size:24px;display:flex;align-items:center;justify-content:center;color:#8A6D4B}
@@ -212,7 +209,7 @@ rule1:"1 ajolote por color",rule2:"1 por fila y columna",rule3:"No se pueden toc
 undo:"Deshacer",axoMode:"Modo colocar: toca una casilla para intentar poner un ajolote",hint:"Pista",reset:"Reiniciar",
 dailyBtn:"Reto diario",howto:"Cómo jugar",howtoTitle:"¿Cómo jugar?",play:"¡A jugar!",
 winTitle:"¡Nivel completado!",dailyWinTitle:"¡Reto diario completado!",next:"Siguiente nivel",replay:"Repetir",
-noHints:"Sin pistas. Completa niveles para ganar más.",hintUsed:"💡 ¡Pista usada!",clueFound:"¡La ? escondía un ajolote!",
+noHints:"Sin pistas. Completa niveles para ganar más.",hintUsed:"💡 ¡Pista usada!",
 axoModeOn:"Modo colocar activado: toca una casilla",axoModeOff:"Modo colocar desactivado",
 wrongTap:"¡Ese no! -1 🐟",
 noFishTitle:"¡Te quedaste sin peces! 🐟",noFishText:"Toca 2 veces con cuidado: cada error cuesta 1 pez.",retry:"Reintentar nivel",
@@ -221,14 +218,14 @@ step1:"Toca una casilla vacía para marcar X. Tócala otra vez para quitarla.",
 step2:"Toca 2 veces rápido una casilla para colocar un ajolote. Si te equivocas, pierdes 1 pez 🐟. Solo tienes 3 peces por nivel. También puedes usar el botón +.",
 step3:"Cada fila, cada columna y cada color debe tener exactamente 1 ajolote.",
 step4:"Los ajolotes no pueden tocarse, ni siquiera en diagonal.",
-step5:"Las celdas ? son pistas: tócalas para revelar un ajolote.",
+step5:"Usa la pista 💡 para colocar un ajolote directamente.",
 dailyDone:"Completado hoy ✓"},
 en:{subtitle:"the axolotl puzzle",level:"Level",daily:"Daily",score:"Score",streak:"streak",
 rule1:"1 axolotl per color",rule2:"1 per row & column",rule3:"They can't touch",
 undo:"Undo",axoMode:"Place mode: tap a tile to try placing an axolotl",hint:"Hint",reset:"Restart",
 dailyBtn:"Daily challenge",howto:"How to play",howtoTitle:"How to play?",play:"Let's play!",
 winTitle:"Level complete!",dailyWinTitle:"Daily challenge complete!",next:"Next level",replay:"Replay",
-noHints:"No hints left. Complete levels to earn more.",hintUsed:"💡 Hint used!",clueFound:"The ? was hiding an axolotl!",
+noHints:"No hints left. Complete levels to earn more.",hintUsed:"💡 Hint used!",
 axoModeOn:"Place mode on: tap a tile",axoModeOff:"Place mode off",
 wrongTap:"Wrong one! -1 🐟",
 noFishTitle:"Out of fish! 🐟",noFishText:"Double-tap carefully: each mistake costs 1 fish.",retry:"Retry level",
@@ -237,7 +234,7 @@ step1:"Tap an empty tile to mark X. Tap it again to remove it.",
 step2:"Double-tap a tile to place an axolotl. If you guess wrong, you lose 1 fish 🐟. You only have 3 fish per level. You can also use the + button.",
 step3:"Each row, each column and each color must have exactly 1 axolotl.",
 step4:"Axolotls can't touch each other, not even diagonally.",
-step5:"? cells are clues: tap them to reveal an axolotl.",
+step5:"Use the 💡 hint to place an axolotl directly.",
 dailyDone:"Done today ✓"}
 };
 function t(k){var L=I18N[S.lang];return (L&&L[k]!==undefined)?L[k]:I18N.es[k];}
@@ -507,7 +504,6 @@ function bankGet(i){
   return {N:N,regions:reg,solution:sol};
 }
 function dayNumber(){return Math.floor(Date.now()/86400000);}
-function clueCountForLevel(n){return n<=10?3:(n<=25?1:0);}
 /* Exhaustive solver with early exit (for self-test verification).
    reg: 2D array of region ids (no -1). Returns number of solutions, capped at limit. */
 function countSolutionsFull(N,reg,limit){
@@ -576,21 +572,16 @@ function verifyBankEntry(e){
 'use strict';
 /* ================= game state ================= */
 var REG_COLORS=['#FFE08A','#FFC98B','#FFB3A0','#B9F0C8','#9FE8CF','#A9DDFB','#C4C1F5','#E3C6F2','#D9EFC2'];
-var G=null,cellEls=[],undoStack=[],scoredCells=new Set(),clueOrig=new Set();
+var G=null,cellEls=[],undoStack=[],scoredCells=new Set();
 var mistakes=0,hintsUsed=0,axoMode=false,won=false,levelNum=1,isDaily=false,lastTapTimes={};
 function loadLevel(n,daily){
-  isDaily=!!daily;levelNum=n;won=false;undoStack=[];scoredCells=new Set();clueOrig=new Set();
+  isDaily=!!daily;levelNum=n;won=false;undoStack=[];scoredCells=new Set();
   mistakes=0;hintsUsed=0;lastTapTimes={};setAxoMode(false);
   $('#winModal').classList.remove('show');$('#noFishModal').classList.remove('show');
   var b=bankGet(daily?(dayNumber()%BANK.length):(n-1));
-  var nClues=daily?0:clueCountForLevel(n);
-  var solArr=Array.from(b.solution);
-  shuffle(solArr,Math.random);
-  var clues=solArr.slice(0,nClues);
   G={N:b.N,regions:b.regions,solution:b.solution,
-     clueCells:new Set(clues),board:Array.from({length:b.N},function(){return new Array(b.N).fill(0);})};
+     board:Array.from({length:b.N},function(){return new Array(b.N).fill(0);})};
   G.lives=3;G.noFish=false;G.scoreStart=S.score;
-  clues.forEach(function(k){var p=k.split(','),r=+p[0],c=+p[1];G.board[r][c]=3;clueOrig.add(k);});
   buildBoard();updateCounters();updateHintBtn();updateDailyBtn();updateFish();
 }
 
@@ -613,7 +604,6 @@ function refreshAllCells(){for(var r=0;r<G.N;r++)for(var c=0;c<G.N;c++)refreshCe
 function refreshCell(r,c){
   var el=cellEls[r][c],v=G.board[r][c];
   el.classList.toggle('x',v===2);
-  el.classList.toggle('clue',v===3);
   var img=el.querySelector('.tok');
   if(v===1){if(!img){img=document.createElement('img');img.className='tok';img.src=FACE_SRC;img.alt='';el.appendChild(img);}}
   else if(img){img.remove();}
@@ -646,25 +636,64 @@ function toast(msg){
 }
 
 /* ================= interactions ================= */
+/* Paint mode: touchstart on a cell + move >12px paints X on every empty cell
+   the finger crosses. Paint only adds X (never axolotls, never costs fish).
+   A tap without moving keeps the classic behavior (X toggle / double-tap). */
+var gest=null,paintLpTimer=null; // active gesture {r,c,sx,sy,down,painting,lpFired,painted:{}}
+function cellFromPoint(x,y){
+  var t=document.elementFromPoint(x,y);
+  var cell=t&&t.closest?t.closest('.cell'):null;
+  if(!cell||cell.dataset.r===undefined)return null;
+  return {r:+cell.dataset.r,c:+cell.dataset.c};
+}
+function paintX(r,c){
+  if(won||!G||G.noFish)return;
+  if(G.board[r][c]!==0)return;   // only empty cells: never touches axolotls, never removes X
+  G.board[r][c]=2;
+  undoStack.push({r:r,c:c,prev:0,next:2});
+  refreshCell(r,c);
+}
+function paintMove(x,y){
+  if(!gest||!gest.down||gest.lpFired)return;
+  if(!gest.painting){
+    if(Math.hypot(x-gest.sx,y-gest.sy)<=12)return;  // not a drag yet: tap/long-press stay armed
+    gest.painting=true;clearTimeout(paintLpTimer);   // paint mode: cancel tap + long-press
+    var s=cellFromPoint(gest.sx,gest.sy);
+    if(s){gest.painted[s.r+','+s.c]=1;paintX(s.r,s.c);}
+  }
+  var p=cellFromPoint(x,y);if(!p)return;
+  var k=p.r+','+p.c;
+  if(gest.painted[k])return;
+  gest.painted[k]=1;
+  paintX(p.r,p.c);
+}
+function paintEnd(){
+  clearTimeout(paintLpTimer);
+  if(!gest)return;
+  var g=gest;gest=null;
+  if(g.painting){validate();updateCounters();return;} // painted: swallow, no tap fires
+  if(g.down&&!g.lpFired)tapCell(g.r,g.c);
+}
 function attachCellHandlers(r,c,el){
-  var lpTimer=null,lpFired=false,sx=0,sy=0;
+  el.dataset.r=r;el.dataset.c=c;
   el.addEventListener('pointerdown',function(e){
-    ensureAudio();lpFired=false;sx=e.clientX;sy=e.clientY;
-    clearTimeout(lpTimer);
-    lpTimer=setTimeout(function(){lpFired=true;longPressCell(r,c);},550);
+    ensureAudio();
+    clearTimeout(paintLpTimer);
+    gest={r:r,c:c,sx:e.clientX,sy:e.clientY,down:true,painting:false,lpFired:false,painted:{}};
+    paintLpTimer=setTimeout(function(){if(gest&&gest.down&&!gest.painting){gest.lpFired=true;longPressCell(gest.r,gest.c);}},550);
   });
-  el.addEventListener('pointermove',function(e){
-    if(Math.hypot(e.clientX-sx,e.clientY-sy)>14)clearTimeout(lpTimer);
-  });
-  el.addEventListener('pointerup',function(){clearTimeout(lpTimer);if(!lpFired)tapCell(r,c);});
-  el.addEventListener('pointercancel',function(){clearTimeout(lpTimer);});
   el.addEventListener('contextmenu',function(e){e.preventDefault();});
 }
+(function initPaint(){
+  var b=document.getElementById('board');
+  b.addEventListener('pointermove',function(e){paintMove(e.clientX,e.clientY);});
+  b.addEventListener('pointerup',function(){paintEnd();});
+  b.addEventListener('pointercancel',function(){clearTimeout(paintLpTimer);gest=null;});
+})();
 function setAxoMode(on){axoMode=on;var b=$('#axoBtn');if(b)b.classList.toggle('active',on);}
 function tapCell(r,c){
   if(won||!G||G.noFish)return;
   var v=G.board[r][c],key=r+','+c,now=Date.now();
-  if(v===3){lastTapTimes[key]={t:0};revealClue(r,c);return;}   // "?" reveal: never costs a fish
   if(v===1){lastTapTimes[key]={t:0};setCell(r,c,0);if(axoMode)setAxoMode(false);return;} // remove own axolotl, no penalty
   if(axoMode){attemptPlace(r,c);setAxoMode(false);return;}     // "+" mode: one tap attempts, then off
   var prev=lastTapTimes[key]||{t:0};
@@ -681,7 +710,6 @@ function tapCell(r,c){
 function longPressCell(r,c){
   if(won||!G||G.noFish)return;
   var v=G.board[r][c];
-  if(v===3){revealClue(r,c);return;}
   if(v===1){setCell(r,c,0);return;}
   attemptPlace(r,c);
   if(navigator.vibrate){try{navigator.vibrate(15);}catch(e){}}
@@ -722,11 +750,6 @@ function pulseFishPill(){
   var p=$('#fishPill');if(!p)return;
   p.classList.remove('pulse');void p.offsetWidth;p.classList.add('pulse');
   setTimeout(function(){p.classList.remove('pulse');},420);
-}
-function revealClue(r,c){
-  G.clueCells.delete(r+','+c);
-  setCell(r,c,1);
-  toast(t('clueFound'));
 }
 function setCell(r,c,val,opts){
   opts=opts||{};
@@ -805,21 +828,19 @@ function showWinModal(stars,bonus,fishGain){
   for(var i2=0;i2<stars;i2++)(function(d){setTimeout(function(){sfx('star');},400+d*200);})(i2);
 }
 function useHint(){
-  // Hint reveals a "?" clue cell on a random unmarked solution cell (never a direct axolotl).
+  // Hint places an axolotl directly on a random empty solution cell (never costs a fish).
   if(won||!G||G.noFish)return;
   refillHints();
   if(S.hints.count<=0){toast(t('noHints'));sfx('error');return;}
   var cand=[];
   G.solution.forEach(function(k){
     var p=k.split(','),r=+p[0],c=+p[1];
-    if(G.board[r][c]!==1&&G.board[r][c]!==3)cand.push({r:r,c:c});
+    if(G.board[r][c]===0)cand.push({r:r,c:c});
   });
   if(!cand.length)return;
   var pick=cand[(Math.random()*cand.length)|0];
   S.hints.count--;hintsUsed++;save();updateHintBtn();
-  var kk=pick.r+','+pick.c;
-  G.clueCells.add(kk);G.board[pick.r][pick.c]=3;
-  refreshCell(pick.r,pick.c);updateCounters();
+  setCell(pick.r,pick.c,1);
   toast(t('hintUsed'));sfx('click');
 }
 function undo(){
@@ -827,18 +848,12 @@ function undo(){
   var m=undoStack.pop();
   if(!m)return;
   G.board[m.r][m.c]=m.prev;
-  if(m.prev===3)G.clueCells.add(m.r+','+m.c);
-  if(m.next===3)G.clueCells.delete(m.r+','+m.c);
   refreshCell(m.r,m.c);validate();updateCounters();sfx('tick');
 }
 function resetLevel(){
   if(won||!G)return;
   undoStack=[];
-  for(var r=0;r<G.N;r++)for(var c=0;c<G.N;c++){
-    var k=r+','+c;
-    if(clueOrig.has(k)){G.board[r][c]=3;G.clueCells.add(k);}
-    else{G.board[r][c]=0;G.clueCells.delete(k);}
-  }
+  for(var r=0;r<G.N;r++)for(var c=0;c<G.N;c++){G.board[r][c]=0;}
   refreshAllCells();validate();updateCounters();sfx('tick');
 }
 </script>
@@ -984,12 +999,25 @@ async function runTests(){
     // --- board starts empty, no givens ---
     loadLevel(1,false);await wait(60);
     ck(G&&G.N===7&&cellEls.length===7&&countV(1)===0&&!G.locked,'board 7x7 starts empty: 0 axolotls, no givens','N='+G.N);
-    ck(countV(3)===3,'level 1 starts with 3 "?" clues',String(countV(3)));
+    ck(countV(3)===0,'level 1 starts with zero "?" cells',String(countV(3)));
+    ck(document.querySelectorAll('.cell.clue').length===0,'no "?" cells in DOM at start','');
+    [5,15,30].forEach(function(ln){loadLevel(ln,false);
+      ck(countV(3)===0&&document.querySelectorAll('.cell.clue').length===0,'level '+ln+' starts with zero "?" cells','');});
+    loadLevel(1,false);await wait(60);
     // --- fish lives: 3 per level, pill shows 3 live fish ---
     ck(G.lives===3,'level starts with 3 fish lives',String(G.lives));
     ck(document.querySelectorAll('#fishLives .lost').length===0,'fish pill shows 3 live fish','');
     function sglTap(r,c){lastTapTimes[r+','+c]={t:0};tapCell(r,c);}
     function dblTap(r,c){lastTapTimes[r+','+c]={t:Date.now()-100,wasAxo:false};tapCell(r,c);}
+    function dragCells(path){ // simulate touch-drag: pointerdown on first cell, moves through all, pointerup
+      var bEl=$('#board');
+      function center(p){var e=cellEls[p.r][p.c].getBoundingClientRect();return {x:e.left+e.width/2,y:e.top+e.height/2};}
+      var s=center(path[0]);
+      cellEls[path[0].r][path[0].c].dispatchEvent(new PointerEvent('pointerdown',{clientX:s.x,clientY:s.y,bubbles:true}));
+      path.forEach(function(p){var q=center(p);
+        bEl.dispatchEvent(new PointerEvent('pointermove',{clientX:q.x,clientY:q.y,bubbles:true}));});
+      bEl.dispatchEvent(new PointerEvent('pointerup',{bubbles:true}));
+    }
     function findSolEmpty(){var f=null;G.solution.forEach(function(k){if(f)return;var q=k.split(','),rr=+q[0],cc=+q[1];if(G.board[rr][cc]===0)f={r:rr,c:cc};});return f;}
     function findWrongEmpty(){for(var wr=0;wr<G.N;wr++)for(var wc=0;wc<G.N;wc++){if(!G.solution.has(wr+','+wc)&&G.board[wr][wc]===0)return {r:wr,c:wc};}return null;}
     // --- rapid X marks: instant, per-cell, no accidental placements ---
@@ -1000,6 +1028,26 @@ async function runTests(){
     ck(countV(1)===0&&G.lives===3,'rapid X taps: no accidental placements, no fish lost',countV(1)+'/'+G.lives);
     xs.forEach(function(p){sglTap(p.r,p.c);});
     ck(countV(2)===0,'X toggles off instantly with a second single tap','');
+    // --- paint mode: drag paints X on empty cells only ---
+    loadLevel(1,false);await wait(60);
+    var dpath=[];for(var dr2=0;dr2<5;dr2++)dpath.push({r:0,c:dr2});
+    var fishD=G.lives;
+    dragCells(dpath);await wait(30);
+    ck(countV(2)===5,'drag across 5 empty cells -> 5 X marks',String(countV(2)));
+    ck(countV(1)===0&&G.lives===fishD,'drag: no placements, no fish lost','');
+    // drag over a placed axolotl leaves it intact
+    var skD=findSolEmpty();dblTap(skD.r,skD.c);await wait(20);
+    ck(G.board[skD.r][skD.c]===1,'setup: axolotl placed for drag test','');
+    var cc0=Math.max(0,Math.min(G.N-3,skD.c-1));
+    var dpath2=[{r:skD.r,c:cc0},{r:skD.r,c:cc0+1},{r:skD.r,c:cc0+2}];
+    dragCells(dpath2);await wait(30);
+    ck(G.board[skD.r][skD.c]===1,'drag over placed axolotl leaves it intact','');
+    ck(G.lives===fishD,'drag over axolotl costs no fish','');
+    setCell(skD.r,skD.c,0,{skipWin:true});
+    // simple tap after a drag still toggles X normally
+    var tD=findEmpty();
+    sglTap(tD.r,tD.c);ck(G.board[tD.r][tD.c]===2,'single tap after drag toggles X','');
+    sglTap(tD.r,tD.c);ck(G.board[tD.r][tD.c]===0,'second tap removes X','');
     // --- single tap toggles X; double-tap on solution cell places ---
     var e=findEmpty();
     sglTap(e.r,e.c);ck(G.board[e.r][e.c]===2,'single tap empty->X','');
@@ -1031,14 +1079,8 @@ async function runTests(){
     ck(!$('#noFishModal').classList.contains('show'),'modal hidden after retry','');
     ck(G.lives===3,'retry restores 3 fish','');
     ck(countV(1)===0&&countV(2)===0,'retry leaves board empty','');
-    ck(countV(3)===3,'retry restores original ? clues',String(countV(3)));
+    ck(countV(3)===0,'retry leaves zero "?" cells',String(countV(3)));
     ck(S.score===G.scoreStart,'retry restores level-start score',S.score+' vs '+G.scoreStart);
-    // --- "?" never costs fish ---
-    var qk=null;G.clueCells.forEach(function(k){if(qk)return;var p=k.split(',');qk={r:+p[0],c:+p[1]};});
-    ck(!!qk,'a ? clue exists','');
-    var f2=G.lives;sglTap(qk.r,qk.c);await wait(30);
-    ck(G.board[qk.r][qk.c]===1,'tap ? reveals its axolotl','');
-    ck(G.lives===f2,'revealing ? costs no fish','');
     // --- long-press on solution cell places directly, no fish lost ---
     var sk2=findSolEmpty();
     if(sk2){var f3=G.lives;longPressCell(sk2.r,sk2.c);
@@ -1062,17 +1104,20 @@ async function runTests(){
     ck(validate()===0,'conflict cleared','');
     sglTap(e.r,e.c);var ul=undoStack.length;undo();
     ck(undoStack.length===ul-1&&G.board[e.r][e.c]===0,'undo restores last move','');
-    // --- hint places a "?" clue, tap reveals ---
-    refillHints();S.hints.count=3;var h0=S.hints.count,clueBefore=countV(3);
+    // --- hint places an axolotl directly on an empty solution cell, never costs fish ---
+    refillHints();S.hints.count=3;var h0=S.hints.count,axoBefore=countV(1),fishBefore=G.lives;
     useHint();await wait(30);
-    var qr=-1,qc=-1;
-    for(var r4=0;r4<G.N;r4++)for(var c4=0;c4<G.N;c4++)if(G.board[r4][c4]===3&&(r4!==e.r||c4!==e.c)){qr=r4;qc=c4;}
-    ck(S.hints.count===h0-1&&countV(3)===clueBefore+1,'hint reveals a "?" clue (never a direct axolotl)','');
-    tapCell(qr,qc);await wait(30);
-    ck(G.board[qr][qc]===1,'tap "?" reveals its axolotl','');
-    // --- reset restores only the original clues ---
+    ck(S.hints.count===h0-1,'hint decrements hint count',S.hints.count+' vs '+(h0-1));
+    ck(countV(1)===axoBefore+1,'hint places exactly 1 axolotl directly',String(countV(1)));
+    ck(countV(3)===0,'hint creates no "?" cells','');
+    ck(G.lives===fishBefore,'hint costs no fish','');
+    var hintOnSol=true;
+    for(var hr=0;hr<G.N;hr++)for(var hc=0;hc<G.N;hc++)
+      if(G.board[hr][hc]===1&&!G.solution.has(hr+','+hc))hintOnSol=false;
+    ck(hintOnSol,'hint axolotl sits on a solution cell','');
+    // --- reset leaves the board fully empty ---
     resetLevel();await wait(30);
-    ck(countV(3)===3&&countV(1)===0,'reset restores 3 original "?" clues, board otherwise empty',countV(3)+'?/'+countV(1)+'axo');
+    ck(countV(3)===0&&countV(1)===0&&countV(2)===0,'reset leaves board fully empty, no "?" cells','');
     // --- full playthrough to win ---
     G.solution.forEach(function(k){var q=k.split(','),rr=+q[0],cc=+q[1];
       if(G.board[rr][cc]!==1)setCell(rr,cc,1,{skipWin:true});});
