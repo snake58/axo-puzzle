@@ -2,12 +2,9 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<!--SDK_HEAD-->
+<script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#FFF3C4">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
 <meta property="og:title" content="AXO PUZZLE — el puzzle de los ajolotes">
 <meta property="og:description" content="Un ajolote por fila, columna y color… ¡sin que se toquen! El puzzle lógico más tierno. Niveles infinitos + reto diario.">
 <meta property="og:image" content="https://snake58.github.io/axo-puzzle/og-image.jpg">
@@ -275,7 +272,87 @@ l.appendChild(s)}document.body.appendChild(l)}catch(e){}})();
 })();
 </script>
 <script>
-//__PORTAL_ADAPTER__
+/* Portal: CrazyGames SDK v3 — https://docs.crazygames.com/
+   Reglas aplicadas: init con await antes que todo (el juego corre sin SDK);
+   gameplayStart con el primer input real (no al cargar); gameplayStop antes de
+   pedir un ad; mute+pausa en adStarted; reanudar en adFinished/adError;
+   se respeta settings.muteAudio; sin boton de fullscreen propio (no existe). */
+window.Portal = (function () {
+  var ready = false, adOpen = false;
+  function sdk(){ return window.CrazyGames.SDK; }
+  function platformMuted(){
+    try { return !!(window.CrazyGames && sdk().game.settings.muteAudio); }
+    catch (e) { return false; }
+  }
+  function applyMute(){ try { window.AxoHooks.setMuted(platformMuted()); } catch (e) {} }
+  function begin(){ adOpen = true; try { window.AxoHooks.setMuted(true); window.AxoHooks.adPause(true); } catch (e) {} }
+  function end(){
+    if (!adOpen) return; adOpen = false;
+    try { window.AxoHooks.adPause(false); } catch (e) {}
+    applyMute();
+  }
+  return {
+    name: "crazygames",
+    rewarded: true,
+    boot: function(){
+      try {
+        sdk().init().then(function (){
+          ready = true;
+          applyMute();
+          try {
+            if (sdk().game.addSettingsChangeListener)
+              sdk().game.addSettingsChangeListener(applyMute);
+          } catch (e) {}
+        }).catch(function (){});
+      } catch (e) {}
+    },
+    gameReady: function(){},
+    gameplayStart: function(){ try { if (ready) sdk().game.gameplayStart(); } catch (e) {} },
+    gameplayStop: function(){ try { if (ready) sdk().game.gameplayStop(); } catch (e) {} },
+    scoreChanged: function(s){}, levelChanged: function(n){},
+    getLang: function(){
+      try {
+        var l = window.CrazyGames && sdk().user && sdk().user.systemInfo && sdk().user.systemInfo.locale;
+        if (l) return String(l).toLowerCase().slice(0, 2);
+      } catch (e) {}
+      return null;
+    },
+    showRewarded: function(cb){
+      var self = this, done = false;
+      function fin(ok){ if(done) return; done = true; try{ cb(ok); }catch(e){} }
+      try { if (ready) self.gameplayStop(); } catch (e) {}
+      begin();
+      try {
+        if (ready) {
+          sdk().ad.requestAd("rewarded", {
+            adStarted: begin,
+            adFinished: function(){ end(); fin(true); },
+            adError: function(){ end(); fin(false); }
+          });
+          /* Seguridad: si los callbacks nunca llegan, reanudar a los 120s */
+          setTimeout(function(){ end(); fin(false); }, 120000);
+        } else { end(); fin(false); }
+      } catch (e) { end(); fin(false); }
+    },
+    showInterstitial: function(){
+      var self = this;
+      try { if (ready) self.gameplayStop(); } catch (e) {}
+      begin();
+      try {
+        if (ready) {
+          sdk().ad.requestAd("midgame", {
+            adStarted: begin,
+            adFinished: end,
+            adError: end
+          });
+          /* Seguridad: si los callbacks nunca llegan, reanudar a los 30s */
+          setTimeout(end, 30000);
+        } else { end(); }
+      } catch (e) { end(); }
+    }
+  };
+})();
+/* AXO PUZZLE BUILD v10 */
 </script>
 <script>'use strict';
 /* ================= PORTAL HOOKS (inert without adapter) =================
